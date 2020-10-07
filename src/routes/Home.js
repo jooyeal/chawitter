@@ -1,9 +1,9 @@
 import { dbService } from "fbinstance";
 import React, { useEffect, useState } from "react";
 import Chaweet from "components/Chaweet";
+import ChaweetFactory from "components/ChaweetFactory";
 
 const Home = ({ userObj }) => {
-  const [chaweet, setChaweet] = useState("");
   const [chaweets, setChaweets] = useState([]);
 
   useEffect(() => {
@@ -15,36 +15,11 @@ const Home = ({ userObj }) => {
       setChaweets(chaweetArray);
     });
   }, []);
-  const onSubmit = async (event) => {
-    event.preventDefault();
-    await dbService.collection("chaweets").add({
-      text: chaweet,
-      createdAt: Date.now(),
-      creatorId: userObj.uid,
-    });
-    setChaweet("");
-  };
 
-  const onChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setChaweet(value);
-  };
   return (
-    <div>
-      <form onSubmit={onSubmit}>
-        <input
-          type="text"
-          placeholder="What's on your mind?"
-          value={chaweet}
-          onChange={onChange}
-          maxLength={120}
-        />
-        <input type="file" accept="image/*" />
-        <input type="submit" value="Chaweet" />
-      </form>
-      <div>
+    <div className="container">
+      <ChaweetFactory userObj={userObj} />
+      <div style={{ marginTop: 30 }}>
         {chaweets.map((chaweet) => (
           <Chaweet
             key={chaweet.id}

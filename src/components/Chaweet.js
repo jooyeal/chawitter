@@ -1,5 +1,7 @@
-import { dbService } from "fbinstance";
+import { dbService, storageService } from "fbinstance";
 import React, { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 const Chaweet = ({ chaweetObj, isOwner }) => {
   const [editing, setEditing] = useState(false);
@@ -8,7 +10,7 @@ const Chaweet = ({ chaweetObj, isOwner }) => {
     const ok = window.confirm("Are you sure want to delete?");
     if (ok) {
       await dbService.doc(`chaweets/${chaweetObj.id}`).delete();
-    } else {
+      await storageService.refFromURL(chaweetObj.downloadUrl).delete();
     }
   };
   const toggleEditing = () => setEditing((prev) => !prev);
@@ -26,28 +28,39 @@ const Chaweet = ({ chaweetObj, isOwner }) => {
     setNewChaweet(value);
   };
   return (
-    <div>
+    <div className="nweet">
       {editing ? (
         <>
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} className="container nweetEdit">
             <input
               placeholder="Edit your chaweet"
               value={newChaweet}
               required
+              autoFocus
               onChange={onChange}
+              className="formInput"
             />
-            <input type="submit" value="Update Chaweet" />
+            <input type="submit" value="Update Chaweet" className="formBtn" />
           </form>
-          <button onClick={toggleEditing}>Cancel</button>
+          <span onClick={toggleEditing} className="formBtn cancelBtn">
+            Cancel
+          </span>
         </>
       ) : (
         <>
           <h4>{chaweetObj.text}</h4>
+
+          {chaweetObj.downloadUrl && <img src={chaweetObj.downloadUrl} />}
+
           {isOwner && (
-            <>
-              <button onClick={onDeleteClick}>Delete Chaweet</button>
-              <button onClick={toggleEditing}>Edit Chaweet</button>
-            </>
+            <div className="nweet__actions">
+              <span onClick={onDeleteClick}>
+                <FontAwesomeIcon icon={faTrash} />
+              </span>
+              <span onClick={toggleEditing}>
+                <FontAwesomeIcon icon={faPencilAlt} />
+              </span>
+            </div>
           )}
         </>
       )}
